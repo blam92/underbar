@@ -410,6 +410,14 @@
 
         expect(mappedNumbers).to.not.equal(numbers);
       });
+
+      it('should work with objects - ADDED', function() {
+        var obj = {one : 1, two : 2, three : 3};
+        var mappedObj = _.map(obj, function(num) {
+          return num + 1;
+        });
+        expect(mappedObj).to.eql({one : 2, two : 3, three : 4});
+      })
     });
 
     describe('pluck', function() {
