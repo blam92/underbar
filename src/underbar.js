@@ -218,18 +218,48 @@
   _.contains = function(collection, target) {
     // TIP: Many iteration problems can be most easily expressed in
     // terms of reduce(). Here's a freebie to demonstrate!
-    return _.reduce(collection, function(wasFound, item) {
-      if (wasFound) {
-        return true;
-      }
-      return item === target;
-    }, false);
+    if(Array.isArray(collection)) {
+      return _.reduce(collection, function(wasFound, item) {
+        if (wasFound) {
+          return true;
+        }
+        return item === target;
+      }, false);
+    } else {
+      var truthFlag = false;
+      _.each(collection, function(value, key, collection) {
+        if(value === target) {
+          truthFlag = true;
+        }
+      });
+
+      return truthFlag;
+    }
   };
 
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
+  	if(Array.isArray(collection)) {
+      if(collection.length < 1) {
+        return true;
+      } else if(iterator === undefined) {
+
+        return _.reduce(collection, function(wasFound, item) {
+          return item;
+        }, false);
+      } else {
+        return _.reduce(collection, function(matchesTruthTest, item) {
+          if(matchesTruthTest === false) {
+            return false;
+          } else {
+            return Boolean(iterator(item));
+          }
+        }, true);
+      }
+    }
     // TIP: Try re-using reduce() here.
+
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -306,6 +336,8 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+  	var cache = {};
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
