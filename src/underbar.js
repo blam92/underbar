@@ -116,7 +116,6 @@
 
     _.each(array, function(value, key, collection) {
       if(isSorted) {
-        console.log(collection + ' | ' + key);
         if(!(value === collection[key + 1])) {
           uniqArray.push(value);
         }
@@ -295,11 +294,34 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var mergedObj = arguments[0];
+
+    for(var i = 1; i < arguments.length; i++) {
+      _.each(arguments[i], function(value, key, collection) {
+        mergedObj[key] = value;
+      });
+    }
+
+    return mergedObj
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+
+    var mergedObj = arguments[0];
+
+    for(var i = 1; i < arguments.length; i++) {
+      _.each(arguments[i], function(value, key, collection) {
+        if(mergedObj[key] === undefined) {
+          mergedObj[key] = value;
+        }
+      });
+    }
+
+    return mergedObj
+
+
   };
 
 
@@ -343,8 +365,23 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-  	var cache = {};
+  	var cache = {};    
 
+    // TIP: We'll return a new function that delegates to the old one, but only
+    // if it hasn't been called before.
+    return function() {
+      // TIP: .apply(this, arguments) is the standard way to pass on all of the
+      // infromation from one function call to another.
+      var args = JSON.stringify(Array.from(arguments));
+
+      if(cache[args] === undefined) {
+        var result = func.apply(this, arguments);
+        cache[args] = result;
+        return result;
+      } else {
+        return cache[args];
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -354,6 +391,11 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.from(arguments).slice(2);
+
+    return setInterval(function() {
+      return func.apply(null, args);
+    }, wait);
   };
 
 
@@ -368,7 +410,21 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
-  };
+    var shuffledArray = array.slice();
+    var position = shuffledArray.length;
+
+    while(position) {
+
+      var randomIndex = Math.floor(Math.random() * position);
+      position--;
+
+      var placeHolder = shuffledArray[position];
+      shuffledArray[position] = shuffledArray[randomIndex];
+      shuffledArray[randomIndex] = placeHolder;
+    }
+
+    return shuffledArray;
+  }
 
 
   /**
