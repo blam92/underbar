@@ -6,13 +6,12 @@
     describe('invoke, when provided a function reference', function() {
       checkForNativeMethods(function() {
         _.invoke(['dog', 'cat'], _.identity);
-      })
+      });
 
       it('runs the input function on each item in the array, and returns a list of results', function() {
         var reverse = function(){
           return this.split('').reverse().join('');
         };
-
         var reversedStrings = _.invoke(['dog', 'cat'], reverse);
 
         expect(reversedStrings).to.eql(['god', 'tac']);

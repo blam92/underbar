@@ -302,7 +302,7 @@
       });
     }
 
-    return mergedObj
+    return mergedObj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
@@ -319,7 +319,7 @@
       });
     }
 
-    return mergedObj
+    return mergedObj;
 
 
   };
@@ -424,7 +424,7 @@
     }
 
     return shuffledArray;
-  }
+  };
 
 
   /**
@@ -438,6 +438,17 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+  	var extraArguments = Array.prototype.slice.call(arguments, 2);
+  	if(typeof(arguments[1]) === 'function') {
+  	  return _.map(collection, function(val) {
+  	  	return functionOrKey.apply(val, extraArguments);
+  	  });
+  	} else {
+	  	return _.map(collection, function(value) {
+	      return value[functionOrKey].apply(value, extraArguments);
+	  	});
+
+  	}
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -453,18 +464,87 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
-  };
+    var args = Array.prototype.slice.call(arguments);
+    var lengths = [];
+    _.each(args, function(val) {
+      lengths.push(val.length);
+    });
 
+    var highestLength = Math.max.apply(null, lengths);
+
+    var addUndefined = function(arr, numberOfUndefined) {
+      var arrWithUndefined = arr.slice();
+      var undefinedsToAdd = numberOfUndefined - arr.length;
+      for(var i = 0; i < undefinedsToAdd; i++) {
+        arrWithUndefined.push(undefined);
+      }
+      return arrWithUndefined;
+    };
+    
+    args = _.map(args, function(val) {
+      return addUndefined(val, highestLength);
+    });
+
+    var zipped = [];
+
+    for(var i = 0; i < args[0].length; i++) {
+      var zippedItems = [];
+
+      (function(array, index) {
+        return _.each(array, function(val) {
+          zippedItems.push(val[index]);
+        });
+      })(args, i);
+      zipped.push(zippedItems);
+    }
+
+    return zipped;
+  };
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    if(result === undefined) {
+      result = [];
+    }
+    _.each(nestedArray, function(val) {
+      if(Array.isArray(val)) {
+        _.flatten(val, result);
+      } else {
+        result.push(val);
+      }
+    });
+
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+
+    if(arguments.length === 1) {
+      return arguments[0];
+    } else {
+      var args = Array.prototype.slice.call(arguments, 1);
+      var firstArray = arguments[0];
+      var intersection = [];
+
+      _.each(firstArray, function(val) {
+        var isIntersection = true;
+        _.each(args, function(array) {
+          isIntersection = _.contains(array, val);
+          if(!isIntersection) {
+            return;
+          }
+        });
+
+        if(isIntersection) {
+          intersection.push(val);
+        }  
+      });
+      return intersection;
+    }
   };
 
   // Take the difference between one array and a number of other arrays.
